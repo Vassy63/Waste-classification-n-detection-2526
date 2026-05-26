@@ -28,7 +28,7 @@ Hiển thị kết quả
 
 ## 2. Pipeline tổng quát
 
-![Pipeline tổng quát](assets/Pipeline DL.drawio.png)
+![Pipeline tổng quát](assets/pipeline_overview.png)
 
 ---
 
