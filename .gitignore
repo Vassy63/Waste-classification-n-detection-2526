@@ -1,0 +1,100 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+
+# Virtual environment
+DeepL/
+venv/
+env/
+.venv/
+.env/
+.env.*
+!.env.example
+
+# Python build / package
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# Jupyter / notebook checkpoints
+.ipynb_checkpoints/
+
+# Dataset
+data/
+datasets/
+dataset/
+*.zip
+*.rar
+*.7z
+*.tar
+*.tar.gz
+*.gz
+
+# Training outputs
+runs/
+weights/
+checkpoints/
+outputs/
+logs/
+wandb/
+mlruns/
+*.pth
+*.pt
+*.onnx
+*.engine
+*.tflite
+*.pb
+
+# Images / media
+*.jpg
+*.jpeg
+*.png
+*.bmp
+*.webp
+*.gif
+*.tif
+*.tiff
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# CSV / result files generated during training
+*.log
+*.tmp
+*.cache
+*.npy
+*.npz
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Gradio / temp files
+gradio_cached_examples/
+flagged/
+# Ignore all scripts by default
+scripts/*
+
+# Keep necessary scripts
+!scripts/check_classification_dataset.py
+!scripts/check_yolo_dataset.py
+!scripts/train_classification_baseline.py
+!scripts/app_classification_test.py
+
+# Allow README assets
+!assets/
+!assets/*.png
+!assets/*.jpg
+!assets/*.jpeg
+!assets/*.webp

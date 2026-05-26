@@ -1,0 +1,12 @@
+pillow
+numpy
+pandas
+matplotlib
+scikit-learn
+opencv-python
+pyyaml
+tqdm
+ultralytics
+ImageHash
+transformers
+gradio
