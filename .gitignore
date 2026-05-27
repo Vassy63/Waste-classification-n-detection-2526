@@ -91,6 +91,7 @@ scripts/*
 !scripts/check_yolo_dataset.py
 !scripts/train_classification_baseline.py
 !scripts/app_classification_test.py
+!scripts/train_classification_improved.py
 
 # Allow README assets
 !assets/
