@@ -13,7 +13,7 @@ import gradio as gr
 BASE_DIR = Path(__file__).resolve().parents[1]
 
 # Sửa đường dẫn này tới model tốt nhất của bạn
-MODEL_PATH = BASE_DIR / "runs" / "classification" / "efficientnet_b0_baseline_20260526_090305" / "best_model.pth"
+MODEL_PATH = BASE_DIR / "runs" / "classification" / "efficientnet_b0_baseline_20260525_135202" / "best_model.pth"
 
 if not MODEL_PATH.exists():
     raise FileNotFoundError(f"Không tìm thấy model tại: {MODEL_PATH}")

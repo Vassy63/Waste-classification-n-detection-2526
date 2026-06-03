@@ -10,3 +10,5 @@ ultralytics
 ImageHash
 transformers
 gradio
+torch
+torchvision

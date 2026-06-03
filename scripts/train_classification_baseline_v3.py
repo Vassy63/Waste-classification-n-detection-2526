@@ -22,16 +22,25 @@ from sklearn.metrics import (
 )
 
 
+# =========================
+# PATH CONFIG
+# =========================
+
 BASE_DIR = Path(__file__).resolve().parents[1]
 DATA_DIR = BASE_DIR / "data"
 
 DATASET_DIR = DATA_DIR / "Dataset_classification_processed" / "fine"
 RUNS_DIR = BASE_DIR / "runs" / "classification"
 
+
+# =========================
+# DEFAULT CONFIG
+# =========================
+
 IMAGE_SIZE = 224
 DEFAULT_BATCH_SIZE = 16
 DEFAULT_EPOCHS = 25
-DEFAULT_LR = 1e-4
+DEFAULT_LR = 0.0001
 NUM_WORKERS = 2
 RANDOM_SEED = 42
 
@@ -117,27 +126,46 @@ def get_dataloaders(batch_size: int):
     return train_loader, val_loader, test_loader, class_names, num_classes
 
 
-def build_model(model_name: str, num_classes: int):
+def build_model(model_name: str, num_classes: int, freeze_backbone: bool = False):
     model_name = model_name.lower()
 
     if model_name == "efficientnet_b0":
         weights = models.EfficientNet_B0_Weights.IMAGENET1K_V1
         model = models.efficientnet_b0(weights=weights)
 
+        if freeze_backbone:
+            for param in model.features.parameters():
+                param.requires_grad = False
+
         in_features = model.classifier[1].in_features
-        model.classifier[1] = nn.Linear(in_features, num_classes)
+        model.classifier = nn.Sequential(
+            nn.Dropout(p=0.4),
+            nn.Linear(in_features, num_classes)
+        )
 
     elif model_name == "resnet50":
         weights = models.ResNet50_Weights.IMAGENET1K_V2
         model = models.resnet50(weights=weights)
 
+        if freeze_backbone:
+            for name, param in model.named_parameters():
+                if not name.startswith("fc"):
+                    param.requires_grad = False
+
         in_features = model.fc.in_features
-        model.fc = nn.Linear(in_features, num_classes)
+        model.fc = nn.Sequential(
+            nn.Dropout(p=0.4),
+            nn.Linear(in_features, num_classes)
+        )
 
     else:
         raise ValueError("model_name chỉ nhận: efficientnet_b0 hoặc resnet50")
 
     return model
+
+def unfreeze_model(model):
+    for param in model.parameters():
+        param.requires_grad = True
 
 
 def train_one_epoch(model, dataloader, criterion, optimizer, device):
@@ -313,6 +341,7 @@ def main():
     parser.add_argument("--epochs", type=int, default=DEFAULT_EPOCHS)
     parser.add_argument("--batch", type=int, default=DEFAULT_BATCH_SIZE)
     parser.add_argument("--lr", type=float, default=DEFAULT_LR)
+    parser.add_argument("--freeze_epochs", type=int, default=5)
 
     args = parser.parse_args()
 
@@ -342,24 +371,25 @@ def main():
         "image_size": IMAGE_SIZE,
         "dataset": str(DATASET_DIR),
         "num_classes": num_classes,
-        "method": "baseline_transfer_learning",
-        "optimizer": "AdamW",
-        "weight_decay": 1e-4,
-        "loss": "CrossEntropyLoss",
+        "freeze_epochs": args.freeze_epochs,
+        "initial_weight_decay": 5e-4,
+        "finetune_weight_decay": 1e-3,
+        "dropout": 0.4,
+        "method": "freeze_backbone_then_unfreeze",
     }
 
     with open(output_dir / "train_config.json", "w", encoding="utf-8") as f:
         json.dump(config, f, indent=4, ensure_ascii=False)
 
-    model = build_model(args.model, num_classes)
+    model = build_model(args.model, num_classes, freeze_backbone=True)
     model = model.to(device)
 
     criterion = nn.CrossEntropyLoss()
 
     optimizer = torch.optim.AdamW(
-        model.parameters(),
+        filter(lambda p: p.requires_grad, model.parameters()),
         lr=args.lr,
-        weight_decay=1e-4,
+        weight_decay=5e-4,
     )
 
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
@@ -382,6 +412,15 @@ def main():
     print(f"Output: {output_dir}")
 
     for epoch in range(1, args.epochs + 1):
+        if epoch == args.freeze_epochs + 1:
+            print("\nUnfreezing full model for fine-tuning...")
+            unfreeze_model(model)
+
+            optimizer = torch.optim.AdamW(
+                model.parameters(),
+                lr=args.lr * 0.5,
+                weight_decay=1e-3,
+            )
         print(f"\nEpoch {epoch}/{args.epochs}")
 
         train_loss, train_acc = train_one_epoch(

@@ -66,7 +66,7 @@ source/
 └── README_TRAINING.md
 ```
 
-Lưu ý: dataset, model, kết quả training và môi trường ảo không lưu trực tiếp trên GitHub. Các phần này nên để trên Google Drive hoặc lưu nội bộ.
+Lưu ý quan trọng: Dữ liệu (dataset) có dung lượng rất lớn nên nhóm không push trực tiếp lên GitHub và cũng không nén lại để gửi Giảng viên (nhằm tránh giới hạn dung lượng và lỗi nén). Giảng viên và người dùng vui lòng tải dữ liệu từ liên kết Google Drive được cung cấp ở mục 9.
 
 ---
 
@@ -184,10 +184,10 @@ trash      → inorganic
 
 ## 6. Cài đặt nhanh
 
-Mở terminal tại thư mục `source`:
+Mở terminal tại thư mục dự án:
 
 ```powershell
-cd "E:\Deep_learning\đồ án\source"
+cd <project-root>
 ```
 
 Tạo và kích hoạt môi trường:
@@ -230,40 +230,33 @@ Nếu kết quả classification không có ảnh lỗi và detection có số �
 
 ---
 
-## 8. Demo classification nhanh
+## 8. Chạy Demo Ứng Dụng
 
-File demo classification:
+Hệ thống cung cấp sẵn hai file giao diện Web UI (sử dụng Gradio) để chạy thử nghiệm:
 
-```text
-scripts/app_classification_test.py
+### 8.1. Demo tích hợp toàn bộ Pipeline (Khuyên dùng)
+File này thực hiện trọn vẹn quy trình: **Ảnh đầu vào → YOLOv8 phát hiện vùng rác → Crop vật thể → Phân loại 16 lớp → Ánh xạ Organic/Inorganic**.
+
+**Lưu ý đặc biệt:** Repo này **đã đính kèm sẵn (bundle)** 2 file model weight cần thiết nhất, người dùng/giảng viên chỉ cần clone repo và chạy mà không cần tải thêm weights thủ công:
+1. Classification model: `runs/classification/efficientnet_b0_baseline_20260525_135202/best_model.pth`
+2. YOLO model: `scripts/runs/detect/runs/yolo/yolo_trash_20epoch-2/weights/best.pt`
+
+Chạy ứng dụng:
+```powershell
+python scripts\app_pipeline_demo.py
 ```
 
-Trước khi chạy, sửa `MODEL_PATH` trong file:
-
-```python
-MODEL_PATH = BASE_DIR / "runs" / "classification" / "<tên_thư_mục_model>" / "best_model.pth"
-```
-
-Chạy demo:
-
+### 8.2. Demo Phân Loại Rác riêng lẻ (Classification Test)
+File giao diện đơn giản dùng để kiểm tra riêng model phân loại 16 lớp trên ảnh đã crop sẵn:
 ```powershell
 python scripts\app_classification_test.py
 ```
 
-Nếu chạy đúng, terminal sẽ hiện:
-
+Khi chạy thành công, terminal sẽ hiển thị địa chỉ truy cập:
 ```text
 Running on local URL: http://127.0.0.1:7860
 ```
-
-Demo hiện tại trả về:
-
-```text
-Fine label
-Coarse label organic/inorganic
-Confidence
-Top 5 dự đoán
-```
+Mở trình duyệt truy cập vào địa chỉ trên để sử dụng giao diện UI.
 
 ---
 

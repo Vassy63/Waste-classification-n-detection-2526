@@ -86,6 +86,11 @@ flagged/
 # Ignore all scripts by default
 scripts/*
 
+# Keep script directories and files
+!scripts/
+!scripts/*.py
+scripts/utils/
+
 # Keep necessary scripts
 !scripts/check_classification_dataset.py
 !scripts/check_yolo_dataset.py
