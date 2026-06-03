@@ -1,18 +1,11 @@
 # README_TRAINING.md
 
 > [!IMPORTANT]
-> **Lưu ý quan trọng:** Dữ liệu (dataset) có dung lượng rất lớn nên nhóm không push trực tiếp lên GitHub và cũng không nén lại để gửi Giảng viên (tránh giới hạn dung lượng và lỗi nén).
+> **Lưu ý quan trọng:** Dữ liệu (dataset) có dung lượng rất lớn nên nhóm không push trực tiếp lên GitHub và cũng không nén lại để gửi (tránh giới hạn dung lượng và lỗi nén).
 
 ## 1. Mục đích
 
-File này hướng dẫn cách kiểm tra dataset và train 2 mô hình baseline cho bài toán classification rác thải:
-
-- EfficientNet-B0 baseline
-- ResNet50 baseline
-
-Hai baseline này dùng để so sánh backbone, chọn mô hình chính và làm mốc đối chứng trước khi áp dụng các cải tiến như class weight, label smoothing, augmentation và hard example mining.
-
----
+File này hướng dẫn cách kiểm tra dataset và train mô hình baseline cho bài toán classification rác thải.
 
 ## 2. Cấu trúc thư mục cần có
 
@@ -21,57 +14,6 @@ Tất cả lệnh bên dưới chạy tại thư mục gốc của dự án:
 ```powershell
 <project-root>
 ```
-
-Cấu trúc dữ liệu classification cần có:
-
-```text
-source/
-├── data/
-│   └── Dataset_classification_processed/
-│       └── fine/
-│           ├── train/
-│           ├── val/
-│           └── test/
-│       └── Dataset_detection_processed/
-│           ├── images/
-│           │   ├── train/
-│           │   ├── val/
-│           │   └── test/
-│           └── labels/
-│               ├── train/
-│               ├── val/
-│               └── test/
-├── scripts/
-│   ├── check_classification_dataset.py
-│   ├── check_yolo_dataset.py
-│   └── train_classification_baseline.py
-├── requirements.txt
-├── requirements_gpu.txt
-└── README_TRAINING.md
-```
-
-Bộ classification hiện tại gồm 16 lớp:
-
-```text
-battery
-biological
-cardboard
-clothes
-fruit_waste
-glass
-meat_waste
-metal
-mixed_food_waste
-paper
-plant_waste
-plastic
-shoes
-starch_waste
-trash
-vegetable_waste
-```
-
----
 
 ## 3. Kích hoạt môi trường ảo
 
@@ -196,8 +138,6 @@ Có thể tự chỉnh số epoch và learning rate:
 python scripts\train_classification_baseline.py --model efficientnet_b0 --epochs 30 --batch 8 --lr 0.0001
 ```
 
----
-
 ## 7. Train ResNet50 baseline
 
 Sau khi train EfficientNet-B0 xong, train tiếp ResNet50:
@@ -300,31 +240,8 @@ runs/classification/
 
 ---
 
-## 11. So sánh các mô hình và thử nghiệm
 
-### 11.1. So sánh 2 baseline
-Sau khi train xong cả EfficientNet-B0 và ResNet50, mở file `test_metrics.json` trong từng thư mục model và lấy các chỉ số: `test_accuracy`, `macro_f1`, `weighted_f1` để lập bảng so sánh:
-
-| Model | Test Accuracy | Macro F1 | Weighted F1 |
-|---|---:|---:|---:|
-| EfficientNet-B0 baseline | ... | ... | ... |
-| ResNet50 baseline | ... | ... | ... |
-
-Nếu EfficientNet-B0 có kết quả gần bằng ResNet50, nên ưu tiên EfficientNet-B0 vì nhẹ và phù hợp demo hơn. Nếu ResNet50 tốt hơn rõ rệt, có thể chọn ResNet50 làm model chính.
-
-### 11.2. Kết quả thử nghiệm Hierarchical Multi-Task Learning
-Dưới đây là bảng tóm tắt kết quả của các phiên bản Multi-Task Learning được thử nghiệm:
-
-| Hướng thử nghiệm | Fine Acc | Fine Macro F1 | Fine Weighted F1 | Coarse Acc | Coarse Macro F1 | Nhận xét |
-|---|---:|---:|---:|---:|---:|---|
-| Multi-task v1 | 0.9063 | 0.9005 | 0.9054 | 0.9945 | 0.9944 | Coarse rất tốt, fine thấp hơn baseline |
-| Multi-task v2 | 0.9019 | 0.8962 | 0.9009 | 0.9928 | 0.9927 | Không vượt baseline |
-
-*Nhận xét:* Mặc dù nhánh coarse task (phân loại 2 nhóm organic/inorganic) đạt độ chính xác gần như tuyệt đối (> 99%), nhánh fine task (16 lớp chi tiết) lại bị giảm hiệu năng so với baseline v0 độc lập. Điều này cho thấy sự phân tán sự chú ý (attention dilution) giữa hai nhiệm vụ trong mô hình Multi-task chung này.
-
----
-
-## 12. Vai trò của 2 baseline trong đề tài
+## 11. 2 baseline và các cải tiến khác trong đề tài
 
 Hai baseline này chưa phải là phần cải tiến chính. Chúng dùng để:
 
@@ -357,15 +274,9 @@ Hierarchical Multi-Task Learning
     ├── Coarse head: phân loại Organic / Inorganic
     ├── Joint loss = Fine loss + alpha × Coarse loss
     └── Đánh giá đồng thời fine metrics và coarse metrics
-    ↓
+    
 YOLO + classifier pipeline
 ```
-
-### 12.1. Hướng cải tiến mở rộng: Hierarchical Multi-Task Learning
-Hierarchical Multi-Task Learning được thử nghiệm để đưa nhãn nhóm organic/inorganic vào trực tiếp trong quá trình huấn luyện, thay vì chỉ ánh xạ sau khi mô hình dự đoán 16 lớp chi tiết. Mô hình sử dụng EfficientNet-B0 làm backbone chung và tách thành hai head đầu ra. Fine head dự đoán 16 lớp rác chi tiết, còn coarse head dự đoán 2 nhóm organic/inorganic. Hàm mất mát tổng được tính bằng fine loss cộng với alpha nhân coarse loss.
-
-**Kết quả & Đánh giá thực nghiệm:**
-Kết quả thực nghiệm cho thấy coarse task đạt độ chính xác rất cao, trên 99%, chứng tỏ mô hình học tốt ranh giới giữa rác hữu cơ và vô cơ. Tuy nhiên, fine classification 16 lớp vẫn thấp hơn EfficientNet-B0 baseline v0. Vì vậy, Multi-Task Learning được xem là một hướng mở rộng có giá trị phân tích về cấu trúc nhãn phân cấp, nhưng không được chọn làm mô hình classification cuối cùng.
 
 Lệnh huấn luyện Multi-Task:
 ```powershell
@@ -374,7 +285,7 @@ python scripts/train_classification_multitask.py --epochs 50 --batch 16 --lr 0.0
 
 ---
 
-## 14. Lỗi thường gặp
+## 12. Lỗi thường gặp
 
 ### Lỗi thiếu `--model`
 
@@ -428,7 +339,7 @@ Nếu kết quả là `False`, máy đang train bằng CPU nên sẽ chậm.
 
 ---
 
-## 15. Lệnh chạy nhanh
+## 13. Lệnh chạy nhanh
 
 Chạy EfficientNet-B0 baseline:
 
