@@ -66,9 +66,6 @@ source/
 └── README_TRAINING.md
 ```
 
-Lưu ý quan trọng: Dữ liệu (dataset) có dung lượng rất lớn nên nhóm không push trực tiếp lên GitHub và cũng không nén lại để gửi Giảng viên (nhằm tránh giới hạn dung lượng và lỗi nén). Giảng viên và người dùng vui lòng tải dữ liệu từ liên kết Google Drive được cung cấp ở mục 9.
-
----
 
 ## 4. Dataset classification/detection
 
@@ -237,7 +234,7 @@ Hệ thống cung cấp sẵn hai file giao diện Web UI (sử dụng Gradio) �
 ### 8.1. Demo tích hợp toàn bộ Pipeline (Khuyên dùng)
 File này thực hiện trọn vẹn quy trình: **Ảnh đầu vào → YOLOv8 phát hiện vùng rác → Crop vật thể → Phân loại 16 lớp → Ánh xạ Organic/Inorganic**.
 
-**Lưu ý đặc biệt:** Repo này **đã đính kèm sẵn (bundle)** 2 file model weight cần thiết nhất, người dùng/giảng viên chỉ cần clone repo và chạy mà không cần tải thêm weights thủ công:
+**Lưu ý đặc biệt:** Repo này **đã đính kèm sẵn (bundle)** 2 file model weight cần thiết nhất, chỉ cần clone repo và chạy mà không cần tải thêm weights thủ công:
 1. Classification model: `runs/classification/efficientnet_b0_baseline_20260525_135202/best_model.pth`
 2. YOLO model: `scripts/runs/detect/runs/yolo/yolo_trash_20epoch-2/weights/best.pt`
 
@@ -260,24 +257,7 @@ Mở trình duyệt truy cập vào địa chỉ trên để sử dụng giao di
 
 ---
 
-## 9. Link Google Drive dataset/model
+## 9. Link Google Drive dataset
 
-Do dataset và model có dung lượng lớn, không lưu trực tiếp trên GitHub.
-
-```text
-Dataset: https://drive.google.com/drive/u/0/folders/1Jo81xS7--e9uifOLvG3EbcCAwwmeXu9V
-
-Trained models / runs: https://drive.google.com/drive/u/0/folders/1Jo81xS7--e9uifOLvG3EbcCAwwmeXu9V
-
-```
-
-Thành viên nhóm sau khi clone repo cần tải dữ liệu từ Drive và đặt đúng cấu trúc:
-
-```text
-source/
-└── data/
-    ├── Dataset_classification_processed/
-    └── Detection_dataset_processed/
-```
-
-Sau đó chạy check dataset trước khi train hoặc demo.
+Do dataset có dung lượng lớn, không lưu trực tiếp trên GitHub.
+Google Drive: https://drive.google.com/drive/u/0/folders/1Jo81xS7--e9uifOLvG3EbcCAwwmeXu9V

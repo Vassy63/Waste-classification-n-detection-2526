@@ -104,3 +104,5 @@ scripts/utils/
 !assets/*.jpg
 !assets/*.jpeg
 !assets/*.webp
+
+!scripts/HEM
